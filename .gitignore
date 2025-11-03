@@ -1,0 +1,30 @@
+# Genel
+.DS_Store
+*.swp
+.env
+.env.local
+node_modules/
+coverage/
+dist/
+build/
+
+# Rails
+sdp_api/log/*
+sdp_api/tmp/*
+sdp_api/storage/*
+sdp_api/vendor/bundle
+sdp_api/.bundle
+sdp_api/db/*.sqlite3
+sdp_api/db/*.sqlite3-*
+
+# Next.js
+sdp-web/.next
+sdp-web/out
+
+# Cypress
+sdp-web/cypress/screenshots
+# sdp-web/cypress/videos (istersen yorum satırını kaldır)
+
+# OS / Editor
+.vscode/
+.idea/

@@ -1,0 +1,82 @@
+{
+  "info": { "name": "SDP Week1 – API Flow", "_postman_id": "sdp-week1", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api/v1" }
+  ],
+  "item": [
+    {
+      "name": "1) Create Scale",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/scales",
+        "body": { "mode": "raw",
+          "raw": "{\"title\":\"Duygu Durum\",\"description\":\"MVP\",\"items\":[{\"text\":\"Keyifsiz hissetme\"},{\"text\":\"Enerji dusuklugu\"}]}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": [
+          "pm.test('201 Created', ()=> pm.response.code === 201);",
+          "const json = pm.response.json();",
+          "pm.environment.set('scale_id', json.id);",
+          "if (json.items && json.items.length >= 2){",
+          "  pm.environment.set('item1_id', json.items[0].id);",
+          "  pm.environment.set('item2_id', json.items[1].id);",
+          "}",
+          "pm.test('Items captured', ()=> pm.environment.get('item1_id') && pm.environment.get('item2_id'));"
+        ] }
+      }]
+    },
+    {
+      "name": "2) Create Survey",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/surveys",
+        "body": { "mode": "raw", "raw": "{\"scale_id\": {{scale_id}} }" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": [
+          "pm.test('201 Created', ()=> pm.response.code === 201);",
+          "const json = pm.response.json();",
+          "pm.environment.set('survey_id', json.id);",
+          "pm.test('survey_id set', ()=> !!pm.environment.get('survey_id'));"
+        ] }
+      }]
+    },
+    {
+      "name": "3) Submit Response",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/surveys/{{survey_id}}/responses",
+        "body": { "mode": "raw",
+          "raw": "{\"participant_code\":\"P1\",\"answers\":[{\"item_id\": {{item1_id}}, \"value\": 4},{\"item_id\": {{item2_id}}, \"value\": 4}]}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": [
+          "pm.test('201 Created', ()=> pm.response.code === 201);",
+          "const json = pm.response.json();",
+          "pm.environment.set('response_id', json.id);"
+        ] }
+      }]
+    },
+    {
+      "name": "4) Summary",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/surveys/{{survey_id}}/summary"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": [
+          "pm.test('200 OK', ()=> pm.response.code === 200);",
+          "const arr = pm.response.json();",
+          "pm.test('has averages', ()=> Array.isArray(arr) && arr.length >= 1 && arr.every(r => r.hasOwnProperty('avg')));"
+        ] }
+      }]
+    }
+  ]
+}
