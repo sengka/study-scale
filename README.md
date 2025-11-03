@@ -31,7 +31,7 @@ Kodu kopyala
 
 ### **Backend – sdp_api**
 
-```bash
+
 cd sdp_api
 bundle install
 bin/rails db:migrate db:seed
